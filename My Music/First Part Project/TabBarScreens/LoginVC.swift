@@ -13,8 +13,6 @@ class LoginVC: UIViewController {
     private let tableView = UITableView()
     private let tfPlaceholder = ["Введите логин", "Введите пароль"]
     private let defaults = UserDefaults.standard
-    private let appScrean = AppViewController()
-    private let popupButton = CancelButton(title: "Ok!", action: nil)
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,13 +38,15 @@ class LoginVC: UIViewController {
         let pdTitle = "Ошибка!"
         let pdMessage = "Неверный логин или пароль"
         let pdImage = UIImage(named: "failurePopup")
+        let popupButton = CancelButton(title: "Ok!", action: nil)
         let popupDialog = PopupDialog(title: pdTitle, message: pdMessage, image: pdImage)
         popupDialog.addButton(popupButton)
-        self.present(popupDialog, animated: true, completion: nil)
+        present(popupDialog, animated: true)
     }
 
 }
 
+//MARK: Extansion for TableView
 extension LoginVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -55,14 +55,14 @@ extension LoginVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
+        let cell = tableView.dequeueReusableCell(withIdentifier: String(describing: TextFieldLogCell.self)) as! TextFieldLogCell
+        
         switch indexPath.row {
         case 0:
-            let cell = tableView.dequeueReusableCell(withIdentifier: String(describing: TextFieldLogCell.self)) as! TextFieldLogCell
             cell.textField.placeholder = tfPlaceholder[indexPath.row]
             return cell
             
         case 1:
-            let cell = tableView.dequeueReusableCell(withIdentifier: String(describing: TextFieldLogCell.self)) as! TextFieldLogCell
             cell.textField.placeholder = tfPlaceholder[indexPath.row]
             cell.textField.isSecureTextEntry = true
             return cell
@@ -82,17 +82,21 @@ extension LoginVC: UITableViewDelegate, UITableViewDataSource {
     
 }
 
+//MARK: Extansion for Login
 private extension LoginVC {
     
     func checkUser() {
         let loginTextFieldCell = tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? TextFieldLogCell
         let passTextFieldCell = tableView.cellForRow(at: IndexPath(row: 1, section: 0)) as? TextFieldLogCell
         
-        if loginTextFieldCell?.textField.text == defaults.string(forKey: passTextFieldCell?.textField.text ?? "1111") {
-            defaults.set(loginTextFieldCell?.textField.text, forKey: "NameLog")
+        let logTF = loginTextFieldCell?.textField.text
+        let passTF = passTextFieldCell?.textField.text
+        
+        if logTF == defaults.string(forKey: passTF ?? "1111") {
+            defaults.set(logTF, forKey: "NameLog")
             let applicationScrean = AppViewController()
             applicationScrean.modalPresentationStyle = .fullScreen
-            self.present(applicationScrean, animated: true, completion: nil)
+            present(applicationScrean, animated: true)
             defaults.set(true, forKey: "LoginSuccess")
         } else {
             showPopupWarn()

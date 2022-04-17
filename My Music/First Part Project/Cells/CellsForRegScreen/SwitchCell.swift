@@ -18,11 +18,7 @@ class SwitchCell: UITableViewCell {
         return label
     }()
     
-    lazy var switchControl: UISwitch = {
-        let switchControl = UISwitch()
-     
-        return switchControl
-    }()
+    lazy var switchControl: UISwitch = UISwitch()
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
