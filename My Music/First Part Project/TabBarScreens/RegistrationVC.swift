@@ -13,7 +13,6 @@ class RegistrationVC: UIViewController {
     
     private let tableView = UITableView()
     private let tfPlaceholder = ["Логин", "E-mail", "Пароль", "Повторите пароль"]
-    private let popupButton = CancelButton(title: "Ok!", action: nil)
     private let defaults = UserDefaults.standard
 
     override func viewDidLoad() {
@@ -38,14 +37,15 @@ class RegistrationVC: UIViewController {
     }
     
     func showPopup(title: String? = nil, message: String? = nil, image: UIImage? = nil) {
+        let popupButton = CancelButton(title: "Ok!", action: nil)
         let popupDialog = PopupDialog(title: title, message: message, image: image)
         popupDialog.addButton(popupButton)
-        self.present(popupDialog, animated: true, completion: nil)
+        present(popupDialog, animated: true)
     }
 
 }
 
-
+// MARK: Extension for TableView
 extension RegistrationVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -54,34 +54,32 @@ extension RegistrationVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
+        let cell = tableView.dequeueReusableCell(withIdentifier: String(describing: TextFieldRegCell.self), for: indexPath) as! TextFieldRegCell
+        
         switch indexPath.row {
         case 0:
-            let cell = tableView.dequeueReusableCell(withIdentifier: String(describing: TextFieldRegCell.self)) as! TextFieldRegCell
             cell.textField.placeholder = tfPlaceholder[indexPath.row]
             cell.validationType = .login
             return cell
             
         case 1:
-            let cell: TextFieldRegCell = tableView.dequeueReusableCell(withIdentifier: String(describing: TextFieldRegCell.self)) as! TextFieldRegCell
             cell.textField.placeholder = tfPlaceholder[indexPath.row]
             cell.validationType = .email
             return cell
             
         case 2:
-            let cell = tableView.dequeueReusableCell(withIdentifier: String(describing: TextFieldRegCell.self)) as! TextFieldRegCell
             cell.textField.placeholder = tfPlaceholder[indexPath.row]
-            //cell.textField.isSecureTextEntry = true
             cell.validationType = .password
+            cell.textField.isSecureTextEntry = true
             return cell
             
         case 3:
-            let cell = tableView.dequeueReusableCell(withIdentifier: String(describing: TextFieldRegCell.self)) as! TextFieldRegCell
             cell.textField.placeholder = tfPlaceholder[indexPath.row]
             cell.textField.isSecureTextEntry = true
             return cell
             
         case 4:
-            let cell = tableView.dequeueReusableCell(withIdentifier: String(describing: SwitchCell.self)) as! SwitchCell
+            let cell: SwitchCell = tableView.dequeueReusableCell(withIdentifier: String(describing: SwitchCell.self)) as! SwitchCell
             return cell
             
         case 5:
@@ -100,27 +98,29 @@ extension RegistrationVC: UITableViewDelegate, UITableViewDataSource {
 }
 
 
-
+// MARK: Extension Registration User
 private extension RegistrationVC {
     
     func saveUserData() {
         let loginTextFieldCell = tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? TextFieldRegCell
         let passTextFieldCell = tableView.cellForRow(at: IndexPath(row: 2, section: 0)) as? TextFieldRegCell
         
-        if loginTextFieldCell?.textField.text == "" || passTextFieldCell?.textField.text == ""{
+        let logTF = loginTextFieldCell?.textField.text
+        let passTF = passTextFieldCell?.textField.text
+        
+        if logTF == "" || passTF == ""{
             showPopup(
                 title: "Ошибка!",
                 message: "Необходимо заполнить все поля",
                 image: UIImage(named: "failurePopup")
             )
         } else {
-            defaults.set(loginTextFieldCell?.textField.text ?? "Unknown", forKey: passTextFieldCell?.textField.text ?? "1111")
+            defaults.set(logTF ?? "Unknown", forKey: passTF ?? "1111")
             
-            showPopup(
-                title: "Готово",
-                message: "Вы успешно зарегистрировались!",
-                image: UIImage(named: "successPopup")
-            )
+            let applicationScrean = AppViewController()
+            applicationScrean.modalPresentationStyle = .fullScreen
+            present(applicationScrean, animated: true)
+            defaults.set(true, forKey: "LoginSuccess")
         }
     }
     
