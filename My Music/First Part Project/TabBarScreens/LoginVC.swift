@@ -8,11 +8,18 @@
 import UIKit
 import PopupDialog
 
+protocol CheckLoginCellDelegate: AnyObject {
+    func checkDataLogin(_ login: String)
+    func checkDataPassword(_ password: String)
+}
+
 class LoginVC: UIViewController {
     
     private let tableView = UITableView()
     private let tfPlaceholder = ["Введите логин", "Введите пароль"]
     private let defaults = UserDefaults.standard
+    private var loginData = ""
+    private var passwordData = ""
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -53,6 +60,10 @@ extension LoginVC: UITableViewDelegate, UITableViewDataSource {
         return 3
     }
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: String(describing: TextFieldLogCell.self)) as! TextFieldLogCell
@@ -60,10 +71,14 @@ extension LoginVC: UITableViewDelegate, UITableViewDataSource {
         switch indexPath.row {
         case 0:
             cell.textField.placeholder = tfPlaceholder[indexPath.row]
+            cell.validationType = .login
+            cell.delegate = self
             return cell
             
         case 1:
             cell.textField.placeholder = tfPlaceholder[indexPath.row]
+            cell.validationType = .password
+            cell.delegate = self
             cell.textField.isSecureTextEntry = true
             return cell
             
@@ -83,21 +98,25 @@ extension LoginVC: UITableViewDelegate, UITableViewDataSource {
 }
 
 //MARK: Extansion for Login
-private extension LoginVC {
+extension LoginVC: CheckLoginCellDelegate {
+    
+    func checkDataLogin(_ login: String) {
+        loginData = login
+    }
+    
+    func checkDataPassword(_ password: String) {
+        passwordData = password
+    }
     
     func checkUser() {
-        let loginTextFieldCell = tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? TextFieldLogCell
-        let passTextFieldCell = tableView.cellForRow(at: IndexPath(row: 1, section: 0)) as? TextFieldLogCell
         
-        let logTF = loginTextFieldCell?.textField.text
-        let passTF = passTextFieldCell?.textField.text
-        
-        if logTF == defaults.string(forKey: passTF ?? "1111") {
-            defaults.set(logTF, forKey: "NameLog")
+        if loginData == defaults.string(forKey: passwordData) {
+            defaults.set(loginData, forKey: "NameLog")
             let applicationScrean = AppViewController()
             applicationScrean.modalPresentationStyle = .fullScreen
             present(applicationScrean, animated: true)
             defaults.set(true, forKey: "LoginSuccess")
+            
         } else {
             showPopupWarn()
         }
