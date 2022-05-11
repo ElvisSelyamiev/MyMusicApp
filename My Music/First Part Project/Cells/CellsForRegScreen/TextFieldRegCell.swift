@@ -16,8 +16,13 @@ class TextFieldRegCell: UITableViewCell, UITextFieldDelegate {
         case password
     }
     
+    weak var delegate: CellDelegate?
     var validationType: ValidationType?
 
+    private var login = ""
+    private var password = ""
+    private let defaults = UserDefaults.standard 
+    
     lazy var textField: UITextField = {
         let textField = UITextField()
         textField.clipsToBounds = true
@@ -46,6 +51,11 @@ class TextFieldRegCell: UITableViewCell, UITextFieldDelegate {
     
     func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
         switch validationType {
+        case .login:
+            login = textField.text ?? ""
+            guard let delegate = delegate else { return false }
+            delegate.passDataLogin(login)
+            
         case .email:
             if isValidEmail(textField.text ?? "") {
                 textField.layer.borderWidth = 0
@@ -65,6 +75,10 @@ class TextFieldRegCell: UITableViewCell, UITextFieldDelegate {
                 textField.layer.borderWidth = 1.0
                 textField.layer.borderColor = CGColor(red: 1.0, green: 0, blue: 0, alpha: 1.0)
             }
+            
+            password = textField.text ?? ""
+            guard let delegate = delegate else { return false }
+            delegate.passDataPassword(password)
             
         default:
             break

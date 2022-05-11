@@ -12,7 +12,7 @@ class AppViewController: UIViewController {
 
     private lazy var label: UILabel = {
         let label = UILabel()
-        label.text = "Добро пожаловать, \(UserDefaults.standard.string(forKey: "NameLog")!)"
+        label.text = "Добро пожаловать, \(defaults.string(forKey: "NameLog")!)"
         label.textAlignment = .center
         label.numberOfLines = 0
         label.font = UIFont.boldSystemFont(ofSize: 22)

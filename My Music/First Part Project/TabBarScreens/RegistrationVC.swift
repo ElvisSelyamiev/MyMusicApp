@@ -9,11 +9,19 @@ import UIKit
 import SnapKit
 import PopupDialog
 
+protocol CellDelegate: AnyObject {
+    func passDataLogin(_ login: String)
+    func passDataPassword(_ password: String)
+}
+
 class RegistrationVC: UIViewController {
     
     private let tableView = UITableView()
     private let tfPlaceholder = ["Логин", "E-mail", "Пароль", "Повторите пароль"]
     private let defaults = UserDefaults.standard
+    private var loginData = ""
+    private var passwordData = ""
+    private var isEmpty = true
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -52,14 +60,20 @@ extension RegistrationVC: UITableViewDelegate, UITableViewDataSource {
         return 6
     }
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: String(describing: TextFieldRegCell.self), for: indexPath) as! TextFieldRegCell
+        
         
         switch indexPath.row {
         case 0:
             cell.textField.placeholder = tfPlaceholder[indexPath.row]
             cell.validationType = .login
+            cell.delegate = self
             return cell
             
         case 1:
@@ -70,6 +84,7 @@ extension RegistrationVC: UITableViewDelegate, UITableViewDataSource {
         case 2:
             cell.textField.placeholder = tfPlaceholder[indexPath.row]
             cell.validationType = .password
+            cell.delegate = self
             cell.textField.isSecureTextEntry = true
             return cell
             
@@ -94,29 +109,34 @@ extension RegistrationVC: UITableViewDelegate, UITableViewDataSource {
         }
         
     }
-    
+        
 }
 
 
 // MARK: Extension Registration User
-private extension RegistrationVC {
+extension RegistrationVC: CellDelegate {
     
+    func passDataLogin(_ login: String) {
+        loginData = login
+    }
+    
+    func passDataPassword(_ password: String) {
+        passwordData = password
+    }
+    
+        
     func saveUserData() {
-        let loginTextFieldCell = tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? TextFieldRegCell
-        let passTextFieldCell = tableView.cellForRow(at: IndexPath(row: 2, section: 0)) as? TextFieldRegCell
         
-        let logTF = loginTextFieldCell?.textField.text
-        let passTF = passTextFieldCell?.textField.text
-        
-        if logTF == "" || passTF == ""{
+        if loginData == "" || passwordData == "" {
             showPopup(
                 title: "Ошибка!",
                 message: "Необходимо заполнить все поля",
                 image: UIImage(named: "failurePopup")
             )
-        } else {
-            defaults.set(logTF ?? "Unknown", forKey: passTF ?? "1111")
             
+        } else {
+            defaults.set(loginData, forKey: passwordData)
+            defaults.set(loginData, forKey: "NameLog")
             let applicationScrean = AppViewController()
             applicationScrean.modalPresentationStyle = .fullScreen
             present(applicationScrean, animated: true)
