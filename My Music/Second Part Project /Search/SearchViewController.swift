@@ -120,7 +120,16 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
             .filter({$0.isKeyWindow}).first
         let trackDetailsView = Bundle.main.loadNibNamed("TrackDetailView", owner: self, options: nil)?.first as! TrackDetailView
         trackDetailsView.set(viewModel: cellViewModel)
-        window?.addSubview(trackDetailsView)
+        trackDetailsView.translatesAutoresizingMaskIntoConstraints = false
+        guard let window = window else { return }
+        window.addSubview(trackDetailsView)
+        
+        NSLayoutConstraint.activate([
+            trackDetailsView.centerXAnchor.constraint(equalTo: window.centerXAnchor),
+            trackDetailsView.widthAnchor.constraint(equalTo: window.widthAnchor),
+            trackDetailsView.topAnchor.constraint(equalTo: window.topAnchor),
+            trackDetailsView.bottomAnchor.constraint(equalTo: window.bottomAnchor)
+        ])
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {

@@ -16,12 +16,11 @@ class TextFieldRegCell: UITableViewCell, UITextFieldDelegate {
         case password
     }
     
-    weak var delegate: CellDelegate?
     var validationType: ValidationType?
-
+    weak var delegate: CellDelegate?
+    private let defaults = UserDefaults.standard
     private var login = ""
     private var password = ""
-    private let defaults = UserDefaults.standard 
     
     lazy var textField: UITextField = {
         let textField = UITextField()

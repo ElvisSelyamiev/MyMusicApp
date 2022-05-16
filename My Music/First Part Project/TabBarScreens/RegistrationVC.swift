@@ -21,7 +21,6 @@ class RegistrationVC: UIViewController {
     private let defaults = UserDefaults.standard
     private var loginData = ""
     private var passwordData = ""
-    private var isEmpty = true
 
     override func viewDidLoad() {
         super.viewDidLoad()
