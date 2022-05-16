@@ -17,9 +17,9 @@ class TextFieldLogCell: UITableViewCell, UITextFieldDelegate {
     
     var validationType: ValidationTypeLog?
     weak var delegate: CheckLoginCellDelegate?
+    private let defaults = UserDefaults.standard
     private var login = ""
     private var password = ""
-    private let defaults = UserDefaults.standard
     
     lazy var textField: UITextField = {
         let textField = UITextField()
