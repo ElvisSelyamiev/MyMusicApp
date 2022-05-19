@@ -50,7 +50,7 @@ class SearchViewController: UIViewController, SearchDisplayLogic {
         
         setupSearchBar()
         setupTableView()
-        
+        searchBar(searchController.searchBar, textDidChange: "MACAN")
     }
     
     private func setupSearchBar() {
@@ -120,6 +120,7 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource {
             .filter({$0.isKeyWindow}).first
         let trackDetailsView = Bundle.main.loadNibNamed("TrackDetailView", owner: self, options: nil)?.first as! TrackDetailView
         trackDetailsView.set(viewModel: cellViewModel)
+        trackDetailsView.delegate = self
         trackDetailsView.translatesAutoresizingMaskIntoConstraints = false
         guard let window = window else { return }
         window.addSubview(trackDetailsView)
@@ -161,4 +162,42 @@ extension SearchViewController: UISearchBarDelegate {
         })
         
     }
+}
+
+extension SearchViewController: TrackMovingDelegate {
+    
+    private func getTrack(isForwardTrack: Bool) -> SearchViewModel.Cell? {
+        guard let indexPath = tableView.indexPathForSelectedRow else { return nil }
+        tableView.deselectRow(at: indexPath, animated: true)
+        var nextIndextPath: IndexPath!
+        if isForwardTrack {
+            nextIndextPath = IndexPath(row: indexPath.row + 1, section: indexPath.section)
+            if nextIndextPath.row == searchViewModel.cells.count {
+                nextIndextPath.row = 0
+            }
+            
+        } else {
+            nextIndextPath = IndexPath(row: indexPath.row - 1, section: indexPath.section)
+            if nextIndextPath.row == -1 {
+                nextIndextPath.row = searchViewModel.cells.count - 1
+            }
+        }
+        
+        tableView.selectRow(at: nextIndextPath, animated: true, scrollPosition: .none)
+        let cellViewModel = searchViewModel.cells[nextIndextPath.row]
+        print("cellViewModel.trackName:", cellViewModel.trackName)
+        
+        return cellViewModel
+    }
+    
+    func moveBackForPreviousTrack() -> SearchViewModel.Cell? {
+        return getTrack(isForwardTrack: false)
+    }
+    
+    func moveForwardForNextTrack() -> SearchViewModel.Cell? {
+        return getTrack(isForwardTrack: true)
+
+    }
+    
+    
 }
